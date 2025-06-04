@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChicBySally - Fashion & Lifestyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- <link rel="stylesheet" href="css/style.css"> --> <!-- Placeholder for Tailwind output, commented out as CDN is used for now -->
+</head>
+<body class="bg-rose-50 text-gray-800 font-sans">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div>
+                <!-- Logo placeholder (Task 2.2) -->
+                <a href="#">
+                    <img src="https://static.shopmy.us/uploads/img-user-deres-85371-1731083331375" alt="ChicBySally Logo" class="h-10 rounded-full">
+                </a>
+            </div>
+            <div>
+                <!-- Social media links placeholder (Task 2.3) -->
+                <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" class="text-gray-800 hover:text-pink-500 mx-2"><i class="fab fa-instagram text-lg"></i></a>
+                <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" class="text-gray-800 hover:text-pink-500 mx-2"><i class="fab fa-youtube text-lg"></i></a>
+                <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" class="hover:text-pink-500 mx-2"><i class="fab fa-tiktok text-lg"></i></a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section (Task 3.0) -->
+        <section id="hero" class="relative h-screen flex items-center justify-center text-center overflow-hidden">
+            <img id="hero-parallax-image" src="images/parallax_bg_chicbysally.png" alt="ChicBySally Parallax Background" class="absolute inset-0 w-full h-full object-cover z-0">
+            <!-- Parallax background image applied via style attribute. bg-fixed provides a simple parallax effect. More advanced JS parallax can be added in 3.3 if needed. -->
+            <div class="absolute inset-0 bg-black opacity-50 z-5"></div> <!-- Overlay for better text readability, ensure it's above the image but below text -->
+            <div class="z-10 relative text-white">
+                <!-- Optional tagline/introductory text (Task 3.4) -->
+                <h1 id="hero-heading" class="text-4xl md:text-6xl font-bold">Welcome to ChicBySally</h1>
+                <p class="mt-4 text-lg md:text-xl">Discover your style.</p>
+            </div>
+        </section>
+
+        <!-- Profile/Bio Section (Task 4.0) -->
+        <section id="profile" class="py-16 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <!-- Profile Image placeholder (Task 4.2) -->
+                <img src="https://static.shopmy.us/uploads/img-user-deres-85371-1731083331375" alt="ChicBySally Profile" class="w-32 h-32 rounded-full mx-auto mb-8 shadow-lg object-cover">
+                <!-- Bio Text placeholder (Task 4.3 will integrate actual bio) -->
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">About ChicBySally</h2>
+                <p class="text-gray-700 leading-relaxed max-w-2xl mx-auto">
+                    Hello, lovely! I'm a fashion curator with a passion for all things chic, trendy, and luxe. I'm here to bring you the latest in designer styles and refined elegance – think elevated looks that blend timeless sophistication with today's hottest trends. Fashion isn't just what I wear; it's how I express my love for art, style, and creativity. Join me as we explore beautiful, one-of-a-kind pieces that make every day a little more fabulous! 💫
+                </p>
+            </div>
+        </section>
+
+        <!-- Mission & Services Section (Task 5.0) -->
+        <section id="mission" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Our Mission</h2>
+                <!-- Placeholder for mission text (Task 5.2) -->
+                <p class="text-gray-700 leading-relaxed max-w-2xl mx-auto">
+                    At ChicBySally, we believe fashion is a narrative waiting to be told. We specialize in crafting exceptionally compelling visual stories that bring curated fashion and accessory collections to life, sparking desire and inspiring personal style. Our vision extends beyond showcasing; we actively foster a vibrant community by seeking out collaborations, embracing user-generated content, and offering bespoke curation services. This dynamic approach allows us to co-create unique and captivating fashion narratives that resonate deeply. The stunning, hyperrealistic imagery and immersive video content we produce are designed not only to enchant our audience but also to serve as powerful, versatile assets for innovative marketing across diverse channels, helping brands and individuals tell their own distinct style stories with unparalleled impact.
+                </p>
+
+                <h3 class="text-2xl font-bold text-gray-800 mt-12 mb-4">Our Services</h3>
+                <!-- Placeholder for services (Task 5.4) -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h4 class="text-xl font-semibold text-pink-600 mb-2">User-Generated Content (UGC) Creation</h4>
+                        <p class="text-gray-700">Elevate your brand with authentic, eye-catching content that speaks directly to your audience. We specialize in producing high-quality, stylish UGC that embodies your brand's essence and drives engagement, perfect for today's dynamic digital landscape.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h4 class="text-xl font-semibold text-pink-600 mb-2">Brand Collaborations</h4>
+                        <p class="text-gray-700">Let's create magic together. We partner with like-minded fashion and accessory brands to develop unique, impactful collaborations. From concept to execution, we bring a sophisticated flair to every project, ensuring your story is told beautifully.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ShopMy Link Section (Task 6.0) -->
+        <section id="shopmy-link" class="py-16 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Explore More</h2>
+                <a href="https://shopmy.us/savvyfashionista" target="_blank" rel="noopener noreferrer" class="inline-block bg-pink-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-pink-600 transition duration-300">
+                    Visit My Curations
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <!-- Copyright text (Task 7.2) -->
+            <p class="mb-2">&copy; 2025 ChicBySally. All rights reserved.</p>
+            <!-- Optional social media links (Task 7.3) -->
+            <div>
+                <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" class="hover:text-pink-500 mx-2"><i class="fab fa-instagram text-lg"></i></a>
+                <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" class="hover:text-pink-500 mx-2"><i class="fab fa-youtube text-lg"></i></a>
+                <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" class="hover:text-pink-500 mx-2"><i class="fab fa-tiktok text-lg"></i></a>
+                <!-- Add other social links as needed -->
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript will be linked here if needed -->
+    <script src="https://cdn.jsdelivr.net/npm/simple-parallax-js@5.5.1/dist/simpleParallax.min.js"></script>
+    <script src="https://unpkg.com/typeit@8.7.0/dist/index.umd.js"></script>
+    <script src="js/effects.js"></script>
+    <!-- <script src="js/main.js"></script> -->
+</body>
+</html>

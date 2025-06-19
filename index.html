@@ -7,6 +7,31 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- <link rel="stylesheet" href="css/style.css"> --> <!-- Placeholder for Tailwind output, commented out as CDN is used for now -->
+     <style>
+        /* Custom styles to ensure smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        .gradient-text {
+            background: -webkit-linear-gradient(45deg, #ec4899, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Keyframe animation for the button pulse effect */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(236, 72, 153, 0);
+            }
+        }
+        .animate-pulse-button {
+            animation: pulse 2s infinite;
+        }
+    </style>
 </head>
 <body class="bg-rose-50 text-gray-800 font-sans">
     <header class="bg-white shadow-md sticky top-0 z-50">
@@ -96,7 +121,7 @@
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span><b>Platforms:</b> Choose 1 (IG, TikTok, or YouTube)</span></li>
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Basic engagement tracking</span></li>
                         </ul>
-                        <p class="text-4xl font-bold text-gray-800 text-center my-4">$199</p>
+                        <p class="text-4xl font-bold text-gray-800 text-center my-4">$159</p>
                         <a href="#contact-form" data-package="Essential Elegance" class="select-package-btn w-full text-center bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-900 transition duration-300 mt-auto">Select Package</a>
                     </div>
 
@@ -111,8 +136,14 @@
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span><b>Platforms:</b> Choose 2 (IG, TikTok, or YouTube)</span></li>
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Detailed audience insights</span></li>
                         </ul>
-                        <p class="text-4xl font-bold text-gray-800 text-center my-4">$249</p>
-                        <a href="#contact-form" data-package="Premium Presence" class="select-package-btn w-full text-center bg-pink-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-pink-600 transition duration-300 mt-auto">Select Package</a>
+                        <div class="text-center my-4">
+                            <div class="flex items-center justify-center gap-2">
+                                <p class="text-4xl font-bold text-gray-800">$199</p>
+                                <p class="text-xl font-medium text-gray-400 line-through">$249</p>
+                            </div>
+                            <p class="text-sm font-bold text-pink-600 mt-1">Special Intro Offer!</p>
+                        </div>
+                        <a href="#contact-form" data-package="Premium Presence" class="select-package-btn animate-pulse-button w-full text-center bg-pink-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-pink-600 transition duration-300 mt-auto">Select Package</a>
                     </div>
 
                     <!-- Package 3: Custom Couture -->
@@ -121,7 +152,7 @@
                         <p class="text-gray-500 italic mb-6">Tailored to Your Vision</p>
                         <ul class="space-y-4 text-gray-700 mb-8 flex-grow">
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Customized content strategy with unlimited images/reels</span></li>
-                            <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span><b>Platforms:</b> All (IG, TikTok, YouTube, Pinterest)</span></li>
+                            <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span><b>Platforms:</b> All (IG, TikTok & YouTube)</span></li>
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>AI-Driven strategy & analytics</span></li>
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Quarterly strategy sessions</span></li>
                         </ul>

@@ -9,8 +9,11 @@
     <meta name="description" content="Elevate your brand with ChicBySally. Specializing in high-quality UGC, brand collaborations, and content creation for fashion, beauty, and lifestyle brands on Instagram, TikTok, and YouTube.">
     <meta name="keywords" content="UGC creator, fashion content, brand collaboration, TikTok creator, Instagram reels, UGC for beauty brands">
     <!-- Standard favicon for browsers -->
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Styles -->
+    <link href="assets/css/page.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- <link rel="stylesheet" href="css/style.css"> --> <!-- Placeholder for Tailwind output, commented out as CDN is used for now -->
      <style>
@@ -49,22 +52,56 @@
   gtag('config', 'G-44T1CQ20MX');
 </script>
 <body class="bg-rose-50 text-gray-800 font-sans">
-    <header class="bg-white shadow-md sticky top-0 z-50">
+     <nav class="navbar navbar-expand-lg navbar-light navbar-stick-dark" data-navbar="sticky">
+      <div class="container">
+
+        <div class="navbar-left">
+          <button class="navbar-toggler" type="button"><span class="navbar-toggler-icon"></span></button>
+          <a class="navbar-brand" href="index.html">
+            <img class="logo-dark" src="images\chic-by-sally-logo.svg" alt="ChicBySally UGC Content Creator Logo">
+            <img class="logo-light" src="https://static.shopmy.us/uploads/img-user-deres-85371-1731083331375" alt="ChicBySally UGC Content Creator Logo">
+          </a>
+        </div>
+
+        <section class="navbar-mobile">
+          <span class="navbar-divider d-mobile-none"></span>
+          <ul class="nav nav-navbar">
+            <li class="nav-item">
+              <a class="nav-link" href="#profile">About</a>             
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#mission">Mission</a>             
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#pricing">Packages</a>             
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#contact-form">Contact</a>             
+            </li>
+          </ul>
+        </section>
+        <div class="navbar-brand">
+            <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" class="text-white hover:text-pink-500 mx-2"><i class="fab fa-instagram text-lg"></i></a>
+            <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" class="text-white hover:text-pink-500 mx-2"><i class="fab fa-youtube text-lg"></i></a>
+            <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" class="text-white hover:text-pink-500 mx-2"><i class="fab fa-tiktok text-lg"></i></a>
+        </div>       
+      </div>
+    </nav><!-- /.navbar -->
+
+    <!--header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
             <div>
-                <!-- Logo placeholder (Task 2.2) -->
                 <a href="#">
                     <img src="https://static.shopmy.us/uploads/img-user-deres-85371-1731083331375" alt="ChicBySally UGC Content Creator Logo" class="h-10 rounded-full">
                 </a>
             </div>
             <div>
-                <!-- Social media links placeholder (Task 2.3) -->
                 <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" class="text-gray-800 hover:text-pink-500 mx-2"><i class="fab fa-instagram text-lg"></i></a>
                 <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" class="text-gray-800 hover:text-pink-500 mx-2"><i class="fab fa-youtube text-lg"></i></a>
                 <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" class="hover:text-pink-500 mx-2"><i class="fab fa-tiktok text-lg"></i></a>
             </div>
         </nav>
-    </header>
+    </header-->
 
     <main>
         <!-- Hero Section (Task 3.0) -->
@@ -74,13 +111,17 @@
             <div class="absolute inset-0 bg-black opacity-50 z-5"></div> <!-- Overlay for better text readability, ensure it's above the image but below text -->
             <div class="z-10 relative text-white">
                 <!-- Optional tagline/introductory text (Task 3.4) -->
-                <h1 id="hero-heading" class="text-4xl md:text-6xl font-bold">Welcome to ChicBySally</h1>
-                <p class="mt-4 text-lg md:text-xl">Discover your style.</p>
+                <h1 id="hero-heading" class="text-4xl md:text-6xl font-bold">Welcome to <span class="fw-600 pl-1" data-typing="ChicBySally" data-loop="false" ></span> </h1>
+                <p class="mt-4 text-lg md:text-xl">Discover your <span class="text-primary" data-typing="personal, beautiful, party , awesome-est"></span> style!</p>
                  <!-- UPDATED: "Explore My Curations" button moved here and restyled for visibility -->
                 <a href="https://shopmy.us/savvyfashionista" target="_blank" rel="noopener noreferrer" class="mt-8 inline-block bg-transparent border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white hover:text-black transition-all duration-300">
                     Explore My Curations
                 </a>
-            </div>
+                <div class="col">
+                <a class="scroll-down-3 scroll-down-white" href="#profile">
+                <span></span><span></span><span></span>
+                 </a>
+                </div>
         </section>
 
         <!-- Profile/Bio Section (Task 4.0) -->
@@ -141,7 +182,7 @@
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Basic engagement tracking</span></li>
                         </ul>
                         <p class="text-4xl font-bold text-gray-800 text-center my-4">$159</p>
-                        <a href="#contact-form" data-package="Essential Elegance" class="select-package-btn w-full text-center bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-900 transition duration-300 mt-auto">Select Package</a>
+                        <a href="#contact-form" data-package="Essential Elegance" class="select-package-btn w-full text-center bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-900 transition duration-300 mt-auto">Select</a>
                     </div>
 
                     <!-- Package 2: Premium Presence (Highlighted) -->
@@ -162,7 +203,7 @@
                             </div>
                             <p class="text-sm font-bold text-pink-600 mt-1">Special Intro Offer!</p>
                         </div>
-                        <a href="#contact-form" data-package="Premium Presence" class="select-package-btn animate-pulse-button w-full text-center bg-pink-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-pink-600 transition duration-300 mt-auto">Select Package</a>
+                        <a href="#contact-form" data-package="Premium Presence" class="select-package-btn animate-pulse-button w-full text-center bg-pink-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-pink-600 transition duration-300 mt-auto">Select</a>
                     </div>
 
                     <!-- Package 3: Custom Couture -->
@@ -176,7 +217,7 @@
                             <li class="flex items-start"><i class="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Quarterly strategy sessions</span></li>
                         </ul>
                         <p class="text-4xl font-bold text-gray-800 text-center my-4">Custom</p>
-                        <a href="#contact-form" data-package="Custom Couture" class="select-package-btn w-full text-center bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-900 transition duration-300 mt-auto">Get a Quote</a>
+                        <a href="#contact-form" data-package="Custom Couture" class="select-package-btn w-full text-center bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-900 transition duration-300 mt-auto">Select</a>
                     </div>
                 </div>
 
@@ -290,7 +331,7 @@
     <script type="module">
     import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
     Chatbot.init({
-        chatflowid: "192c31ec-7db3-42f0-8f64-959ba9973ec6",
+        chatflowid: "017f27ae-bdf7-418c-a1b1-bc4d427a71bd",
         apiHost: "https://flowise.askaibot.com",
         chatflowConfig: {
             /* Chatflow Config */
@@ -384,6 +425,9 @@
         }
     })
 </script>
+ <!-- Scripts -->
+    <script src="assets/js/page.min.js"></script>
+    <script src="assets/js/script.js"></script>
 
 </body>
 </html>

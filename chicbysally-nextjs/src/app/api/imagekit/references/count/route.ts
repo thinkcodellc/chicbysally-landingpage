@@ -22,17 +22,21 @@ export async function GET() {
       cache: "no-store",
     });
 
+    // Minimal diagnostics
+    console.log("[ImageKit] GET files count ->", apiUrl);
+
     if (!response.ok) {
       const text = await response.text();
-      console.error("ImageKit count error:", response.status, text);
+      console.error("[ImageKit] Count error:", response.status, text);
       return NextResponse.json(
-        { error: `ImageKit request failed: ${response.status}` },
+        { error: `ImageKit request failed: ${response.status}`, details: text },
         { status: 500 }
       );
     }
 
     const data = await response.json();
     const count = Array.isArray(data) ? data.length : 0;
+    console.log("[ImageKit] Count success:", count);
 
     return NextResponse.json(count);
   } catch (err) {

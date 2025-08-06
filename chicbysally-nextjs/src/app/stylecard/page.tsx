@@ -7,6 +7,7 @@ import Link from "next/link";
 // IMPORTANT: Avoid importing server-only env reading code into a client component.
 // We will call a server action (API) instead.
 import { ReferenceImage } from "@/lib/data";
+import Image from "next/image";
 import ImageUpload from "@/components/stylecard/ImageUpload";
 import ReferenceImageGrid from "@/components/stylecard/ReferenceImageGrid";
 import TryOnButton from "@/components/stylecard/TryOnButton";
@@ -201,9 +202,11 @@ export default function StyleCardPage() {
                 <div className="mb-4 sm:mb-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Selected Reference Style</h3>
                   <div className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
-                    <img 
+                    <Image 
                       src={selectedImage.url} 
                       alt={selectedImage.title}
+                      width={64}
+                      height={64}
                       className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg"
                     />
                     <div>

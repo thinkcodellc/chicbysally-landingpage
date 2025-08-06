@@ -21,7 +21,7 @@ export default function TypingEffect({
   const elementRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    let typeitInstance: any;
+    let typeitInstance: { destroy: () => void } | null = null;
 
     if (typeof window !== 'undefined' && elementRef.current) {
       typeitInstance = new TypeIt(elementRef.current, {

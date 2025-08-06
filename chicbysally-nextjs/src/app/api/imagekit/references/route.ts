@@ -29,16 +29,20 @@ export async function GET(req: Request) {
       cache: "no-store",
     });
 
+    // Minimal diagnostics
+    console.log("[ImageKit] GET files list ->", apiUrl);
+
     if (!response.ok) {
       const text = await response.text();
-      console.error("ImageKit list error:", response.status, text);
+      console.error("[ImageKit] List error:", response.status, text);
       return NextResponse.json(
-        { error: `ImageKit request failed: ${response.status}` },
+        { error: `ImageKit request failed: ${response.status}`, details: text },
         { status: 500 }
       );
     }
 
     const data = await response.json();
+    console.log("[ImageKit] List success: items=", Array.isArray(data) ? data.length : 0);
     // Normalize to our ReferenceImage[]
     const images = (Array.isArray(data) ? data : []).map(
       (item: { fileId: string; url: string; name?: string }) => ({

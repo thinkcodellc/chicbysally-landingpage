@@ -15,7 +15,7 @@ export default function HomePage() {
           <div className="absolute inset-0 w-full h-full">
             <Image
               src="/images/parallax_bg_chicbysally.png"
-              alt="Stylish flat lay of fashion accessories representing ChicBySally's content creation services"
+              alt="Stylish flat lay of fashion accessories representing ChicBySally&#39;s content creation services"
               fill
               className="object-cover"
               priority
@@ -50,7 +50,7 @@ export default function HomePage() {
             />
             <h2 className="text-3xl font-bold text-gray-800 mb-4">About ChicBySally</h2>
             <p className="text-gray-700 leading-relaxed max-w-2xl mx-auto">
-              Hello, lovely! I'm a fashion curator with a passion for all things chic, trendy, and luxe. I'm here to bring you the latest in designer styles and refined elegance – think elevated looks that blend timeless sophistication with today's hottest trends. Fashion isn't just what I wear; it's how I express my love for art, style, and creativity. Join me as we explore beautiful, one-of-a-kind pieces that make every day a little more fabulous! 💫
+              Hello, lovely! I&#39;m a fashion curator with a passion for all things chic, trendy, and luxe. I&#39;m here to bring you the latest in designer styles and refined elegance – think elevated looks that blend timeless sophistication with today&#39;s hottest trends. Fashion isn&#39;t just what I wear; it&#39;s how I express my love for art, style, and creativity. Join me as we explore beautiful, one-of-a-kind pieces that make every day a little more fabulous! 💫
             </p>
           </div>
         </section>
@@ -67,11 +67,11 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white p-6 rounded-lg shadow-lg">
                 <h4 className="text-xl font-semibold text-pink-600 mb-2">User-Generated Content (UGC) Creation</h4>
-                <p className="text-gray-700">Elevate your brand with authentic, eye-catching content that speaks directly to your audience. We specialize in producing high-quality, stylish UGC that embodies your brand's essence and drives engagement.</p>
+                <p className="text-gray-700">Elevate your brand with authentic, eye-catching content that speaks directly to your audience. We specialize in producing high-quality, stylish UGC that embodies your brand&#39;s essence and drives engagement.</p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-lg">
                 <h4 className="text-xl font-semibold text-pink-600 mb-2">Brand Collaborations</h4>
-                <p className="text-gray-700">Let's create magic together. We partner with like-minded fashion and accessory brands to develop unique, impactful collaborations. From concept to execution, we bring a sophisticated flair to every project.</p>
+                <p className="text-gray-700">Let&#39;s create magic together. We partner with like-minded fashion and accessory brands to develop unique, impactful collaborations. From concept to execution, we bring a sophisticated flair to every project.</p>
               </div>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function HomePage() {
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Our Packages</h2>
-              <p className="text-gray-600 mt-2">Choose the perfect plan to elevate your brand's presence.</p>
+              <p className="text-gray-600 mt-2">Choose the perfect plan to elevate your brand&#39;s presence.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -148,8 +148,8 @@ export default function HomePage() {
         <section id="contact-form" className="py-20 bg-rose-50">
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Let's Connect</h2>
-              <p className="text-gray-600 mt-2">Fill out the form below and I'll get back to you as soon as possible.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800">Let&#39;s Connect</h2>
+              <p className="text-gray-600 mt-2">Fill out the form below and I&#39;ll get back to you as soon as possible.</p>
             </div>
             <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg">
               <form action="https://formspree.io/f/mdkzlozg" method="POST">

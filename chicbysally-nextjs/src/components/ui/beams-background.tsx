@@ -67,8 +67,9 @@ export function BeamsBackground({
 
       // Reset transform before resizing to avoid cumulative scales
       // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/resetTransform
-      if (typeof (ctx as any).resetTransform === "function") {
-        (ctx as any).resetTransform();
+      const maybeReset = (ctx as unknown as { resetTransform?: () => void }).resetTransform;
+      if (typeof maybeReset === "function") {
+        maybeReset();
       }
 
       canvas.width = window.innerWidth * dpr;
@@ -172,6 +173,8 @@ export function BeamsBackground({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
+  // opacityMap is stable; we don't include it to avoid unnecessary re-renders
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intensity]);
 
   return (

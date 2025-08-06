@@ -14,13 +14,12 @@ import TryOnButton from "@/components/stylecard/TryOnButton";
 import ResultsDisplay from "@/components/stylecard/ResultsDisplay";
 import Navbar from "@/components/Navbar";
 import { FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
-import BeamsBackground from "@/components/ui/beams-background";
 
 export default function StyleCardPage() {
   const { data: session, status } = useSession();
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
-  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  // After upload we keep only the server URL for preview/use
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -95,15 +94,14 @@ export default function StyleCardPage() {
     }
   }, [status]);
 
+  // ImageUpload now returns the compressed File; create an object URL for immediate preview
   const handleImageUpload = (file: File) => {
-    setUploadedImage(file);
-    
-    // Create preview URL
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setUploadedImageUrl(e.target?.result as string);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const url = URL.createObjectURL(file);
+      setUploadedImageUrl(url);
+    } catch (e) {
+      console.warn("Failed to create preview URL:", e);
+    }
   };
 
   const handleImageSelect = (image: ReferenceImage) => {
@@ -111,7 +109,7 @@ export default function StyleCardPage() {
   };
 
   const handleTryOn = async () => {
-    if (!uploadedImage || !selectedImageId) return;
+    if (!uploadedImageUrl || !selectedImageId) return;
     
     setIsProcessing(true);
     setShowResults(true);
@@ -160,12 +158,14 @@ export default function StyleCardPage() {
   const isDesktop = windowWidth >= 1024;
 
   return (
-    <BeamsBackground intensity="strong">
-      <div className="min-h-screen bg-transparent text-gray-100">
-        {/* Use the same Navbar as index page */}
-        <Navbar />
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 via-gray-200 to-gray-100 text-gray-800">
+      {/* Use the same Navbar as index page */}
+      <Navbar />
 
-      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-12">
+      {/* Spacer to prevent sticky navbar overlapping content */}
+      <div className="h-16 md:h-20"></div>
+
+      <main className="container mx-auto px-4 sm:px-6 pb-12">
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Virtual Try-On Studio</h1>
           <p className="text-base sm:text-xl text-gray-600 max-w-2xl sm:max-w-3xl mx-auto px-2">
@@ -218,7 +218,7 @@ export default function StyleCardPage() {
               {/* Try On Button */}
               <TryOnButton 
                 onClick={handleTryOn}
-                disabled={!uploadedImage || !selectedImageId}
+                disabled={!uploadedImageUrl || !selectedImageId}
                 loading={isProcessing}
                 selectedImageId={selectedImageId}
               />
@@ -342,7 +342,6 @@ export default function StyleCardPage() {
           </div>
         </div>
       </footer>
-      </div>
-    </BeamsBackground>
+    </div>
   );
 }

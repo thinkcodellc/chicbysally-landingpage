@@ -30,10 +30,11 @@ export default function Navbar() {
 
   return (
     <nav 
-      className={`navbar navbar-expand-lg navbar-light ${isSticky ? 'navbar-sticky' : ''}`}
-      data-navbar="sticky"
+      className="navbar navbar-expand-lg text-white shadow-md bg-[linear-gradient(90deg,_#737872,_#717771)] bg-opacity-75"
+      data-navbar="static"
+      style={{ position: "sticky", top: 0, zIndex: 50, backdropFilter: "saturate(120%) blur(2px)" }}
     >
-      <div className="container">
+      <div className="container text-white">
         <div className="navbar-left">
           <button 
             className="navbar-toggler" 
@@ -43,48 +44,44 @@ export default function Navbar() {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          <Link href="/" className="navbar-brand">
-            <Image 
-              src="/images/chic_by_sally_logo.png" 
-              alt="ChicBySally Logo" 
-              width={160}
-              height={40}
-              className="logo-dark"
-              priority
-            />
-          </Link>
+          {/* Placeholder for brand/logo — to be replaced later */}
+          <div className="navbar-brand">
+            <div className="h-10 w-36 rounded-md bg-white/10 ring-1 ring-white/15 flex items-center justify-center text-xs uppercase tracking-widest">
+              Logo Placeholder
+            </div>
+          </div>
         </div>
 
         <div className={`navbar-mobile ${isMenuOpen ? 'show' : ''}`}>
           <span className="navbar-divider d-mobile-none"></span>
-          <ul className="nav nav-navbar">
+          <ul className="nav nav-navbar text-white">
             {/* Home should be first and always navigate to index */}
             <li className="nav-item">
-              <Link href="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>Home</Link>
+              <Link href="/" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>Home</Link>
             </li>
             {/* These links should always navigate to sections on the home page */}
             <li className="nav-item">
-              <Link href="/#profile" className="nav-link" onClick={() => setIsMenuOpen(false)}>About</Link>
+              <Link href="/#profile" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>About</Link>
             </li>
             <li className="nav-item">
-              <Link href="/#mission" className="nav-link" onClick={() => setIsMenuOpen(false)}>Mission</Link>
+              <Link href="/#mission" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>Mission</Link>
             </li>
             <li className="nav-item">
-              <Link href="/#pricing" className="nav-link" onClick={() => setIsMenuOpen(false)}>Packages</Link>
+              <Link href="/#pricing" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>Packages</Link>
             </li>
             {/* Show StyleCard menu item only when user is logged in */}
             {session && (
               <li className="nav-item">
-                <Link href="/stylecard" className="nav-link" onClick={() => setIsMenuOpen(false)}>StyleCard</Link>
+                <Link href="/stylecard" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>StyleCard</Link>
               </li>
             )}
             <li className="nav-item">
-              <Link href="/#contact-form" className="nav-link" onClick={() => setIsMenuOpen(false)}>Contact</Link>
+              <Link href="/#contact-form" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>Contact</Link>
             </li>
           </ul>
         </div>
         
-        <div className="navbar-brand">
+        <div className="navbar-brand text-white">
           {status === "loading" ? (
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-500 mr-2"></div>
@@ -131,14 +128,14 @@ export default function Navbar() {
             </div>
           )}
           
-          <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-500 mx-2 ml-4">
-            <FaInstagram className="inline-block align-middle text-lg" aria-label="Instagram" />
+          <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-400 mx-2 ml-4">
+            <FaInstagram className="inline-block align-middle text-xl" aria-label="Instagram" />
           </a>
-          <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-500 mx-2">
-            <FaYoutube className="inline-block align-middle text-lg" aria-label="YouTube" />
+          <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-400 mx-2">
+            <FaYoutube className="inline-block align-middle text-xl" aria-label="YouTube" />
           </a>
-          <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-500 mx-2">
-            <FaTiktok className="inline-block align-middle text-lg" aria-label="TikTok" />
+          <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-400 mx-2">
+            <FaTiktok className="inline-block align-middle text-xl" aria-label="TikTok" />
           </a>
         </div>       
       </div>

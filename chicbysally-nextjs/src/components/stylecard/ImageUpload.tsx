@@ -1,20 +1,26 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 interface ImageUploadProps {
+  // After compression, emit the compressed File; parent will create an object URL for preview
   onImageUpload: (file: File) => void;
+  // Parent controls preview by passing the preview object URL back in
   previewUrl?: string;
 }
 
 export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [preview, setPreview] = useState<string | undefined>(previewUrl);
+  // Preview is controlled by parent; sanitize to avoid falsy empty strings
+  const preview = typeof previewUrl === "string" && previewUrl.trim().length > 0 ? previewUrl : undefined;
   const [error, setError] = useState<string | null>(null);
   const [compressing, setCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const objectUrlRef = useRef<string | null>(null);
   const isActiveRef = useRef(true);
+  // Simple re-entrancy guard (kept minimal to avoid blocking input)
+  const isOpeningRef = useRef(false);
 
   // Cleanup object URL and mark inactive on unmount
   // Prevents setState after unmount and ensures we don't revoke an already-removed node
@@ -50,6 +56,8 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Always release guard when dialog closes (even on cancel) on next tick
+    setTimeout(() => { isOpeningRef.current = false; }, 0);
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       handleFile(file);
@@ -76,31 +84,40 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
         }
       }
 
-      // Revoke previous object URL if any
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
-      }
-      // Prefer object URL for preview; avoids large base64 strings and allows safe revoke
-      const objectUrl = URL.createObjectURL(workingFile);
-      objectUrlRef.current = objectUrl;
-      if (isActiveRef.current) {
-        setPreview(objectUrl);
-      }
-
-      // Pass file upward
+      // Emit the compressed File so parent can create an object URL for immediate preview
       onImageUpload(workingFile);
     } catch (err) {
-      console.error("Image handling error:", err);
+      console.error("Image upload error:", err);
       setCompressing(false);
       if (isActiveRef.current) {
         setError("Failed to process the image. Please try again.");
       }
+    } finally {
+      // Always clear the file input so selecting the same file re-triggers onChange
+      if (fileInputRef.current) {
+        try {
+          fileInputRef.current.value = "";
+        } catch {}
+      }
+      // Ensure dialog guard is released
+      isOpeningRef.current = false;
     }
   };
 
   const handleClick = () => {
-    fileInputRef.current?.click();
+    if (compressing) return;
+    // Minimize chances of a stuck guard: set and release on a short timer if no onChange
+    if (isOpeningRef.current) return;
+    isOpeningRef.current = true;
+    // Some browsers need a microtask delay to open the dialog reliably
+    setTimeout(() => {
+      // If the input is disabled by browser focus/blur timing, ensure it exists and is enabled
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+      // Failsafe: if onChange doesn’t fire (user ESC/cancel), release guard shortly
+      setTimeout(() => { isOpeningRef.current = false; }, 500);
+    }, 0);
   };
 
   return (
@@ -121,23 +138,35 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
       )}
       
       <div 
+        role="button"
+        aria-disabled={compressing}
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
           isDragging 
             ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-200' 
             : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
-        }`}
+        } ${compressing ? 'opacity-80' : ''}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={handleClick}
       >
         {preview ? (
-          <div className="relative aspect-square">
-            <img 
+          <div className="relative block w-full aspect-[4/5] md:aspect-square min-h-[240px]">
+            {/* Prefer next/image; additionally render a plain img for robustness */}
+            <Image 
               src={preview} 
               alt="Preview" 
-              className="w-full h-full object-cover rounded-lg"
+              fill
+              sizes="100vw"
+              className="object-cover rounded-lg"
+              unoptimized
+              priority
             />
+            {/* Always-on fallback duplicate to guarantee render */}
+            <img src={preview} alt="Preview" className="hidden w-full h-full object-cover rounded-lg" onError={(e) => {
+              // If next/image fails, reveal the plain img
+              (e.currentTarget as HTMLImageElement).classList.remove("hidden");
+            }} />
           </div>
         ) : (
           <>
@@ -150,8 +179,10 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
             </p>
             <button 
               type="button"
+              onClick={handleClick}
               className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition duration-300"
               aria-busy={compressing}
+              disabled={compressing}
             >
               {compressing ? "Compressing..." : "Choose File"}
             </button>
@@ -184,8 +215,8 @@ async function compressImage(file: File, targetBytes = 1_000_000): Promise<File>
     });
 
   // Initial draw
-  let width = img.naturalWidth;
-  let height = img.naturalHeight;
+  const width = img.naturalWidth;
+  const height = img.naturalHeight;
   const maxEdgeStart = Math.max(width, height);
   const minQuality = 0.5;
   const qualitySteps = [0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5];
@@ -231,12 +262,22 @@ async function compressImage(file: File, targetBytes = 1_000_000): Promise<File>
   return outFile;
 }
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("FileReader failed"));
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(file);
+  });
+}
+
 function fileToHTMLImageElement(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("FileReader failed"));
     reader.onload = () => {
-      const img = new Image();
+      // Explicitly construct an HTMLImageElement to satisfy TS during build
+      const img: HTMLImageElement = document.createElement("img");
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error("Image decode failed"));
       img.src = reader.result as string;

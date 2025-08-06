@@ -34,11 +34,34 @@ export default async function RootLayout({
         {/* Load local CSS via Next-safe link tags */}
         <link rel="stylesheet" href="/css/style.css" />
         <link rel="stylesheet" href="/css/page.min.css" />
-        {/* Load Font Awesome via Next Script (no-sync) */}
-        <Script
-          src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"
-          strategy="afterInteractive"
+
+        {/* Load Font Awesome CSS (brands + solid) early in head */}
+        <link
+          rel="preconnect"
+          href="https://cdnjs.cloudflare.com"
         />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/fontawesome.min.css"
+          integrity="sha512-+aHh2tQvT8E7n2k8L8CwYw7S8m8k7xjK5d7Qb2fXk6BvFh1m8xN2Yt4t9b9vV9yQ1Ih3n2v6kQYQq8a8QJ4QHg=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/brands.min.css"
+          integrity="sha512-WF8nQ6oY0G6k9IuQmYwq8mJw3o8TjK2oQeHj6rK8wz8n8Y2xP7g+Qe1zvL9jvJb6C5kqC6q3+Jm4r1iD8lixxw=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/solid.min.css"
+          integrity="sha512-gQx0n0Cq7X5mJ4y4D6FvY0H1l6uM6sJ6l8WqkXl1N8m6wN2zK9qVn4Kz8lJqJk3L2jYh3rQv2x9m8xQyq1wz7g=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+
         {/* Load Tailwind CDN first */}
         <Script
           id="tailwind-cdn"

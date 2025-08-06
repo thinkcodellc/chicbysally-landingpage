@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession, signIn, signOut } from "next-auth/react";
+import { FaInstagram, FaYoutube, FaTiktok, FaGoogle } from "react-icons/fa";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -57,17 +58,28 @@ export default function Navbar() {
         <div className={`navbar-mobile ${isMenuOpen ? 'show' : ''}`}>
           <span className="navbar-divider d-mobile-none"></span>
           <ul className="nav nav-navbar">
+            {/* Home should be first and always navigate to index */}
             <li className="nav-item">
-              <Link href="#profile" className="nav-link" onClick={() => setIsMenuOpen(false)}>About</Link>
+              <Link href="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>Home</Link>
+            </li>
+            {/* These links should always navigate to sections on the home page */}
+            <li className="nav-item">
+              <Link href="/#profile" className="nav-link" onClick={() => setIsMenuOpen(false)}>About</Link>
             </li>
             <li className="nav-item">
-              <Link href="#mission" className="nav-link" onClick={() => setIsMenuOpen(false)}>Mission</Link>
+              <Link href="/#mission" className="nav-link" onClick={() => setIsMenuOpen(false)}>Mission</Link>
             </li>
             <li className="nav-item">
-              <Link href="#pricing" className="nav-link" onClick={() => setIsMenuOpen(false)}>Packages</Link>
+              <Link href="/#pricing" className="nav-link" onClick={() => setIsMenuOpen(false)}>Packages</Link>
             </li>
+            {/* Show StyleCard menu item only when user is logged in */}
+            {session && (
+              <li className="nav-item">
+                <Link href="/stylecard" className="nav-link" onClick={() => setIsMenuOpen(false)}>StyleCard</Link>
+              </li>
+            )}
             <li className="nav-item">
-              <Link href="#contact-form" className="nav-link" onClick={() => setIsMenuOpen(false)}>Contact</Link>
+              <Link href="/#contact-form" className="nav-link" onClick={() => setIsMenuOpen(false)}>Contact</Link>
             </li>
           </ul>
         </div>
@@ -96,7 +108,7 @@ export default function Navbar() {
                 onClick={() => handleLogin("google")}
                 className="bg-white text-gray-800 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition duration-300 flex items-center space-x-1"
               >
-                <i className="fab fa-google mr-1"></i>
+                <FaGoogle className="mr-1" aria-hidden="true" />
                 <span className="hidden md:inline">Google</span>
               </button>
               {/* Temporarily hidden per request */}
@@ -120,13 +132,13 @@ export default function Navbar() {
           )}
           
           <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-500 mx-2 ml-4">
-            <i className="fab fa-instagram text-lg"></i>
+            <FaInstagram className="inline-block align-middle text-lg" aria-label="Instagram" />
           </a>
           <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-500 mx-2">
-            <i className="fab fa-youtube text-lg"></i>
+            <FaYoutube className="inline-block align-middle text-lg" aria-label="YouTube" />
           </a>
           <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" className="text-white hover:text-pink-500 mx-2">
-            <i className="fab fa-tiktok text-lg"></i>
+            <FaTiktok className="inline-block align-middle text-lg" aria-label="TikTok" />
           </a>
         </div>       
       </div>

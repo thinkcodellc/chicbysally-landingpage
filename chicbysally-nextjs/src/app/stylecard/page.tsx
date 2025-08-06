@@ -12,6 +12,9 @@ import ImageUpload from "@/components/stylecard/ImageUpload";
 import ReferenceImageGrid from "@/components/stylecard/ReferenceImageGrid";
 import TryOnButton from "@/components/stylecard/TryOnButton";
 import ResultsDisplay from "@/components/stylecard/ResultsDisplay";
+import Navbar from "@/components/Navbar";
+import { FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
+import BeamsBackground from "@/components/ui/beams-background";
 
 export default function StyleCardPage() {
   const { data: session, status } = useSession();
@@ -27,6 +30,16 @@ export default function StyleCardPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // TEMP: Global error listener to capture NotFoundError stacks in browser
+  useEffect(() => {
+    const handler = (event: ErrorEvent) => {
+      // Log full error and stack so we can see originating file/line
+      console.error("[GlobalError]", event.error?.name, event.error?.message, event.error?.stack || event.message);
+    };
+    window.addEventListener("error", handler);
+    return () => window.removeEventListener("error", handler);
+  }, []);
+
   // Load reference images with pagination
   useEffect(() => {
     const loadImages = async () => {
@@ -35,7 +48,7 @@ export default function StyleCardPage() {
       try {
         // Call our server endpoints so the client never reads env vars
         const [imagesRes, countRes] = await Promise.all([
-          fetch(`/api/imagekit/references?page=${currentPage}&limit=5`, { cache: "no-store" }),
+          fetch(`/api/imagekit/references?page=${currentPage}&limit=6`, { cache: "no-store" }),
           fetch(`/api/imagekit/references/count`, { cache: "no-store" }),
         ]);
 
@@ -139,7 +152,7 @@ export default function StyleCardPage() {
   }
 
   const selectedImage = referenceImages.find(img => img.id === selectedImageId);
-  const totalPages = Math.ceil(totalImages / 5);
+  const totalPages = Math.ceil(totalImages / 6);
 
   // Determine layout based on screen size
   const isMobile = windowWidth < 768;
@@ -147,24 +160,10 @@ export default function StyleCardPage() {
   const isDesktop = windowWidth >= 1024;
 
   return (
-    <div className="min-h-screen bg-rose-50 text-gray-800">
-      {/* Header */}
-      <header className="bg-white shadow-sm py-4 sticky top-0 z-10">
-        <div className="container mx-auto px-4 sm:px-6 flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-pink-600">StyleCard</h1>
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <div className="hidden sm:block text-sm text-gray-600 truncate max-w-[120px]">
-              Welcome, {session.user?.name || session.user?.email}
-            </div>
-            <Link 
-              href="/" 
-              className="text-xs sm:text-sm text-pink-600 hover:text-pink-800 font-medium whitespace-nowrap"
-            >
-              Back to Home
-            </Link>
-          </div>
-        </div>
-      </header>
+    <BeamsBackground intensity="strong">
+      <div className="min-h-screen bg-transparent text-gray-100">
+        {/* Use the same Navbar as index page */}
+        <Navbar />
 
       <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-12">
         <div className="text-center mb-8 sm:mb-12">
@@ -263,6 +262,18 @@ export default function StyleCardPage() {
                   onImageSelect={handleImageSelect}
                 />
               )}
+              {/* Social icons row to mimic index footer styling */}
+              <div className="mt-6 flex justify-center space-x-4 text-gray-600">
+                <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
+                  <FaInstagram className="inline-block align-middle text-lg" aria-label="Instagram" />
+                </a>
+                <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
+                  <FaYoutube className="inline-block align-middle text-lg" aria-label="YouTube" />
+                </a>
+                <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
+                  <FaTiktok className="inline-block align-middle text-lg" aria-label="TikTok" />
+                </a>
+              </div>
               
               {/* Pagination */}
               {!loading && !error && totalPages > 1 && (
@@ -320,17 +331,18 @@ export default function StyleCardPage() {
           <p className="mb-2 text-sm sm:text-base">&copy; 2025 ChicBySally. All rights reserved.</p>
           <div className="flex justify-center space-x-3 sm:space-x-4">
             <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 text-lg sm:text-xl">
-              <i className="fab fa-instagram"></i>
+              <FaInstagram className="inline-block align-middle text-lg" aria-label="Instagram" />
             </a>
             <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 text-lg sm:text-xl">
-              <i className="fab fa-youtube"></i>
+              <FaYoutube className="inline-block align-middle text-lg" aria-label="YouTube" />
             </a>
             <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 text-lg sm:text-xl">
-              <i className="fab fa-tiktok"></i>
+              <FaTiktok className="inline-block align-middle text-lg" aria-label="TikTok" />
             </a>
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </BeamsBackground>
   );
 }

@@ -21,26 +21,21 @@ export default function ReferenceImageGrid({
           <div 
             key={image.id}
             onClick={() => onImageSelect(image)}
-            className={`group cursor-pointer rounded-lg overflow-hidden transition-all duration-300 ${
+            className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 ${
               selectedImageId === image.id
                 ? 'ring-4 ring-pink-500 ring-opacity-50'
                 : 'hover:ring-2 hover:ring-pink-300'
             }`}
           >
-            <div className="aspect-square bg-gray-100 relative overflow-hidden">
+            {/* Fixed-size square tile with rounded corners */}
+            <div className="relative bg-gray-100 overflow-hidden rounded-xl" style={{ aspectRatio: '1 / 1' }}>
               <img 
                 src={image.url} 
                 alt={image.title}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div className="absolute bottom-2 left-2 right-2 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="text-xs font-medium truncate">{image.title}</div>
-              </div>
             </div>
-            <div className="mt-2">
-              <div className="text-sm font-medium text-gray-800 truncate">{image.title}</div>
-            </div>
+            {/* Hide filename/title per request */}
           </div>
         ))}
       </div>

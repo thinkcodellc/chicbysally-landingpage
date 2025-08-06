@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import TypingEffect from "@/components/TypingEffect";
+import { FaInstagram, FaYoutube, FaTiktok, FaCheckCircle } from "react-icons/fa";
 
 export default function HomePage() {
   return (
@@ -91,10 +92,10 @@ export default function HomePage() {
                 <h3 className="text-2xl font-bold text-pink-600 mb-2">Essential Elegance</h3>
                 <p className="text-gray-500 italic mb-6">Perfect for a Quick Impact</p>
                 <ul className="space-y-4 text-gray-700 mb-8 flex-grow">
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>2 high-quality images & 1 hi-res 5s video (9:16)</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>1 engaging post & 1 reel</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span><b>Platforms:</b> Choose 1 (IG, TikTok, or YouTube)</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Basic engagement tracking</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>2 high-quality images & 1 hi-res 5s video (9:16)</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>1 engaging post & 1 reel</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span><b>Platforms:</b> Choose 1 (IG, TikTok, or YouTube)</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>Basic engagement tracking</span></li>
                 </ul>
                 <p className="text-4xl font-bold text-gray-800 text-center my-4">$159</p>
                 <Link href="#contact-form" className="w-full text-center bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-900 transition duration-300 mt-auto">
@@ -108,10 +109,10 @@ export default function HomePage() {
                 <h3 className="text-2xl font-bold text-pink-600 mb-2">Premium Presence</h3>
                 <p className="text-gray-500 italic mb-6">For a Broader Reach</p>
                 <ul className="space-y-4 text-gray-700 mb-8 flex-grow">
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>4 high-quality images & 2 hi-res 5s videos (9:16)</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>2 engaging posts & reel</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span><b>Platforms:</b> Choose 2 (IG, TikTok, or YouTube)</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Detailed audience insights</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>4 high-quality images & 2 hi-res 5s videos (9:16)</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>2 engaging posts & reel</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span><b>Platforms:</b> Choose 2 (IG, TikTok, or YouTube)</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>Detailed audience insights</span></li>
                 </ul>
                 <div className="text-center my-4">
                   <div className="flex items-center justify-center gap-2">
@@ -130,10 +131,10 @@ export default function HomePage() {
                 <h3 className="text-2xl font-bold text-pink-600 mb-2">Custom Couture</h3>
                 <p className="text-gray-500 italic mb-6">Tailored to Your Vision</p>
                 <ul className="space-y-4 text-gray-700 mb-8 flex-grow">
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Customized content strategy with unlimited images/reels</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span><b>Platforms:</b> All (IG, TikTok & YouTube)</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>AI-Driven strategy & analytics</span></li>
-                  <li className="flex items-start"><i className="fas fa-check-circle text-pink-500 mr-3 mt-1"></i><span>Quarterly strategy sessions</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>Customized content strategy with unlimited images/reels</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span><b>Platforms:</b> All (IG, TikTok & YouTube)</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>AI-Driven strategy & analytics</span></li>
+<li className="flex items-start"><FaCheckCircle className="text-pink-500 mr-3 mt-1 h-5 w-5 shrink-0" aria-hidden="true" /><span>Quarterly strategy sessions</span></li>
                 </ul>
                 <p className="text-4xl font-bold text-gray-800 text-center my-4">Custom</p>
                 <Link href="#contact-form" className="w-full text-center bg-gray-800 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-900 transition duration-300 mt-auto">
@@ -205,13 +206,13 @@ export default function HomePage() {
           <p className="mb-2">&copy; 2025 ChicBySally. All rights reserved.</p>
           <div>
             <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 mx-2">
-              <i className="fab fa-instagram text-lg"></i>
+              <FaInstagram className="inline-block align-middle text-lg" aria-label="Instagram" />
             </a>
             <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 mx-2">
-              <i className="fab fa-youtube text-lg"></i>
+              <FaYoutube className="inline-block align-middle text-lg" aria-label="YouTube" />
             </a>
             <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 mx-2">
-              <i className="fab fa-tiktok text-lg"></i>
+              <FaTiktok className="inline-block align-middle text-lg" aria-label="TikTok" />
             </a>
           </div>
         </div>

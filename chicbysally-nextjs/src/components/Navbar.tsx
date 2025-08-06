@@ -99,6 +99,8 @@ export default function Navbar() {
                 <i className="fab fa-google mr-1"></i>
                 <span className="hidden md:inline">Google</span>
               </button>
+              {/* Temporarily hidden per request */}
+              {/*
               <button
                 onClick={() => handleLogin("facebook")}
                 className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300 flex items-center space-x-1"
@@ -113,6 +115,7 @@ export default function Navbar() {
                 <i className="fab fa-twitter mr-1"></i>
                 <span className="hidden md:inline">X</span>
               </button>
+              */}
             </div>
           )}
           

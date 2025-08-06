@@ -1,5 +1,9 @@
-// Data fetching for reference images from ImageKit API
-// Fetches from https://api.imagekit.io/v1/files?path:"/Reference/"
+/**
+ * Data fetching for reference images from ImageKit API
+ * Correct endpoint format per feedback:
+ *   https://api.imagekit.io/v1/files?path:Reference
+ * Note: keep this code server-side (Node) so IMAGEKIT_API_KEY is not exposed.
+ */
 
 export interface ReferenceImage {
   id: string;
@@ -15,8 +19,8 @@ export const getReferenceImages = async (page: number = 1, limit: number = 5): P
     // Calculate skip for pagination
     const skip = (page - 1) * limit;
     
-    // Construct API URL with pagination parameters
-    const apiUrl = `https://api.imagekit.io/v1/files?path=/Reference/&skip=${skip}&limit=${limit}`;
+    // Construct API URL with pagination parameters (correct path format)
+    const apiUrl = `https://api.imagekit.io/v1/files?path:Reference&skip=${skip}&limit=${limit}`;
     
     // Get API key from environment variables
     const apiKey = process.env.IMAGEKIT_API_KEY;
@@ -44,7 +48,7 @@ export const getReferenceImages = async (page: number = 1, limit: number = 5): P
     const data = await response.json();
     
     // Transform API response to ReferenceImage format
-    return data.map((item: any) => ({
+    return data.map((item: { fileId: string; url: string; name?: string }) => ({
       id: item.fileId,
       url: item.url,
       title: item.name || 'Reference Image'
@@ -69,8 +73,8 @@ export const getReferenceImagesCount = async (): Promise<number> => {
     // Create Basic Authentication header (username = API key, password = empty)
     const authHeader = 'Basic ' + Buffer.from(`${apiKey}:`).toString('base64');
     
-    // Fetch from ImageKit API to get count
-    const response = await fetch('https://api.imagekit.io/v1/files?path=/Reference/', {
+    // Fetch from ImageKit API to get count (correct path format)
+    const response = await fetch('https://api.imagekit.io/v1/files?path:Reference', {
       headers: {
         'Authorization': authHeader,
         'Accept': 'application/json'

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getReferenceImages, getReferenceImagesCount } from "@/lib/data";
+// IMPORTANT: Avoid importing server-only env reading code into a client component.
+// We will call a server action (API) instead.
 import { ReferenceImage } from "@/lib/data";
 import ImageUpload from "@/components/stylecard/ImageUpload";
 import ReferenceImageGrid from "@/components/stylecard/ReferenceImageGrid";
@@ -31,11 +32,23 @@ export default function StyleCardPage() {
       setLoading(true);
       setError(null);
       try {
-        const images = await getReferenceImages(currentPage, 5);
+        // Call our server endpoints so the client never reads env vars
+        const [imagesRes, countRes] = await Promise.all([
+          fetch(`/api/imagekit/references?page=${currentPage}&limit=5`, { cache: "no-store" }),
+          fetch(`/api/imagekit/references/count`, { cache: "no-store" }),
+        ]);
+
+        if (!imagesRes.ok) {
+          throw new Error(`Images request failed ${imagesRes.status}`);
+        }
+        if (!countRes.ok) {
+          throw new Error(`Count request failed ${countRes.status}`);
+        }
+
+        const images: ReferenceImage[] = await imagesRes.json();
+        const count: number = await countRes.json();
+
         setReferenceImages(images);
-        
-        // Load total count for pagination
-        const count = await getReferenceImagesCount();
         setTotalImages(count);
       } catch (error) {
         console.error("Failed to load reference images:", error);

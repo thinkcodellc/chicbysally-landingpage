@@ -1,31 +1,39 @@
-import { auth } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
+import NextAuth, { type NextAuthConfig } from "next-auth";
+import Google from "next-auth/providers/google";
+// Temporarily hide Facebook and X (Twitter) providers
+// import Facebook from "next-auth/providers/facebook";
+// import Twitter from "next-auth/providers/twitter";
 
-// Helper function to get the current session
-export async function getCurrentUser() {
-  const session = await auth();
-  return session?.user;
-}
+const config: NextAuthConfig = {
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    // Facebook({
+    //   clientId: process.env.FACEBOOK_CLIENT_ID!,
+    //   clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+    // }),
+    // Twitter({
+    //   clientId: process.env.TWITTER_CLIENT_ID!,
+    //   clientSecret: process.env.TWITTER_CLIENT_SECRET!,
+    // }),
+  ],
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async session({ session, token }) {
+      if (token.sub && session.user) {
+        // augment session at runtime
+        (session.user as { id?: string }).id = token.sub;
+      }
+      return session;
+    },
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+  },
+};
 
-// Helper function to check if user is authenticated
-export async function isAuthenticated() {
-  const session = await auth();
-  return !!session;
-}
-
-// Helper function to protect routes
-export async function protectRoute() {
-  const session = await auth();
-  if (!session) {
-    redirect("/?error=unauthorized");
-  }
-  return session;
-}
-
-// Helper function to redirect authenticated users
-export async function redirectIfAuthenticated(redirectPath: string = "/stylecard") {
-  const session = await auth();
-  if (session) {
-    redirect(redirectPath);
-  }
-}
+// Export NextAuth utilities for use across the app
+export const { auth, signIn, signOut, handlers } = NextAuth(config);

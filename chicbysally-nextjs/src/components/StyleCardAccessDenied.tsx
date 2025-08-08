@@ -79,7 +79,7 @@ export default function StyleCardAccessDenied() {
             </div>
 
             <p className="text-sm text-gray-500 mt-6">
-              Already subscribed? Make sure you're signed in with the correct account.
+              Already subscribed? Make sure you&#39;re signed in with the correct account.
             </p>
           </div>
         </div>

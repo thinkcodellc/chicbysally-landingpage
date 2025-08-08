@@ -76,6 +76,9 @@ export default function Navbar() {
             <li className="nav-item">
               <Link href="/#contact-form" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>Contact</Link>
             </li>
+            <li className="nav-item">
+              <Link href="/pricing" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>Pricing</Link>
+            </li>
           </ul>
         </div>
         

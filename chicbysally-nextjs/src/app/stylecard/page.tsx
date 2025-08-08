@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 // IMPORTANT: Avoid importing server-only env reading code into a client component.
@@ -16,7 +16,7 @@ import Navbar from "@/components/Navbar";
 import { FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 
 export default function StyleCardPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
   // After upload we keep only the server URL for preview/use
@@ -89,10 +89,10 @@ export default function StyleCardPage() {
 
   // Redirect to home if not authenticated
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (isLoaded && !user) {
       redirect("/");
     }
-  }, [status]);
+  }, [isLoaded, user]);
 
   // ImageUpload now returns the compressed File; create an object URL for immediate preview
   const handleImageUpload = (file: File) => {
@@ -134,7 +134,7 @@ export default function StyleCardPage() {
     }
   };
 
-  if (status === "loading") {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-rose-50">
         <div className="text-center">
@@ -145,7 +145,7 @@ export default function StyleCardPage() {
     );
   }
 
-  if (!session) {
+  if (!user) {
     return null;
   }
 

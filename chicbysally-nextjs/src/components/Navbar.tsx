@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { FaInstagram, FaYoutube, FaTiktok, FaGoogle } from "react-icons/fa";
+import { useUser, SignInButton, SignOutButton, UserButton } from "@clerk/nextjs";
+import { FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,13 +20,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogin = (provider: string) => {
-    signIn(provider, { callbackUrl: "/stylecard" });
-  };
-
-  const handleLogout = () => {
-    signOut({ callbackUrl: "/" });
-  };
 
   return (
     <nav 
@@ -44,11 +37,16 @@ export default function Navbar() {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          {/* Placeholder for brand/logo — to be replaced later */}
+          {/* ChicBySally Logo */}
           <div className="navbar-brand">
-            <div className="h-10 w-36 rounded-md bg-white/10 ring-1 ring-white/15 flex items-center justify-center text-xs uppercase tracking-widest">
-              Logo Placeholder
-            </div>
+            <Image 
+              src="/images/ChicBySally_Transparent_Logo.png" 
+              alt="ChicBySally Logo" 
+              width={120}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </div>
         </div>
 
@@ -70,7 +68,7 @@ export default function Navbar() {
               <Link href="/#pricing" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>Packages</Link>
             </li>
             {/* Show StyleCard menu item only when user is logged in */}
-            {session && (
+            {user && (
               <li className="nav-item">
                 <Link href="/stylecard" className="nav-link text-white hover:text-pink-400" onClick={() => setIsMenuOpen(false)}>StyleCard</Link>
               </li>
@@ -82,32 +80,29 @@ export default function Navbar() {
         </div>
         
         <div className="navbar-brand text-white">
-          {status === "loading" ? (
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-500 mr-2"></div>
-              <span className="text-white">Loading...</span>
-            </div>
-          ) : session ? (
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:flex items-center space-x-2 text-white">
-                <span className="text-sm">Welcome, {session.user?.name || session.user?.email}</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-300"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
+{!isLoaded ? (
+  <div className="flex items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-500 mr-2"></div>
+    <span className="text-white">Loading...</span>
+  </div>
+) : user ? (
+  <div className="flex items-center space-x-4">
+    <UserButton 
+      appearance={{
+        elements: {
+          userButtonAvatarBox: "w-8 h-8 rounded-full",
+          userButtonOuterBox: "flex items-center"
+        }
+      }}
+    />
+  </div>
+) : (
             <div className="flex items-center space-x-2">
-              <button
-                onClick={() => handleLogin("google")}
-                className="bg-white text-gray-800 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition duration-300 flex items-center space-x-1"
-              >
-                <FaGoogle className="mr-1" aria-hidden="true" />
-                <span className="hidden md:inline">Google</span>
-              </button>
+              <SignInButton mode="modal">
+                <button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
+                  Sign In
+                </button>
+              </SignInButton>
               {/* Temporarily hidden per request */}
               {/*
               <button

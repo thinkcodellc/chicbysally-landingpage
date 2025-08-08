@@ -13,6 +13,8 @@ import ReferenceImageGrid from "@/components/stylecard/ReferenceImageGrid";
 import TryOnButton from "@/components/stylecard/TryOnButton";
 import ResultsDisplay from "@/components/stylecard/ResultsDisplay";
 import Navbar from "@/components/Navbar";
+import StyleCardAccessDenied from "@/components/StyleCardAccessDenied";
+import { Protect } from "@clerk/nextjs";
 import { FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
 
 export default function StyleCardPage() {
@@ -165,7 +167,11 @@ export default function StyleCardPage() {
       {/* Spacer to prevent sticky navbar overlapping content */}
       <div className="h-16 md:h-20"></div>
 
-      <main className="container mx-auto px-4 sm:px-6 pb-12">
+      <Protect
+        feature="stylecard"
+        fallback={<StyleCardAccessDenied />}
+      >
+        <main className="container mx-auto px-4 sm:px-6 pb-12">
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Virtual Try-On Studio</h1>
           <p className="text-base sm:text-xl text-gray-600 max-w-2xl sm:max-w-3xl mx-auto px-2">
@@ -342,6 +348,7 @@ export default function StyleCardPage() {
           </div>
         </div>
       </footer>
+    </Protect>
     </div>
   );
 }

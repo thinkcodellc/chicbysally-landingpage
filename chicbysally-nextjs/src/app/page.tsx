@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import ScrollToTop from "@/components/ScrollToTop";
 import TypingEffect from "@/components/TypingEffect";
 import { FaInstagram, FaYoutube, FaTiktok, FaCheckCircle } from "react-icons/fa";
 
@@ -217,6 +218,8 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      
+      <ScrollToTop />
     </div>
   );
 }

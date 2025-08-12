@@ -12,6 +12,8 @@ import ImageUpload from "@/components/stylecard/ImageUpload";
 import ReferenceImageGrid from "@/components/stylecard/ReferenceImageGrid";
 import TryOnButton from "@/components/stylecard/TryOnButton";
 import ResultsDisplay from "@/components/stylecard/ResultsDisplay";
+import FaceSwapComponent from "@/components/stylecard/FaceSwapComponent";
+import { ErrorBoundary } from "@/components/stylecard/ErrorBoundary";
 import Navbar from "@/components/Navbar";
 import StyleCardAccessDenied from "@/components/StyleCardAccessDenied";
 import { Protect } from "@clerk/nextjs";
@@ -106,9 +108,14 @@ export default function StyleCardPage() {
     }
   };
 
-  const handleImageSelect = (image: ReferenceImage) => {
-    setSelectedImageId(image.id);
+  const handleImageSelect = (image: ReferenceImage | null) => {
+    console.log('StyleCardPage: handleImageSelect called with image:', image);
+    setSelectedImageId(image ? image.id : null);
   };
+
+  useEffect(() => {
+    console.log('StyleCardPage: selectedImageId updated to:', selectedImageId);
+  }, [selectedImageId]);
 
   const handleTryOn = async () => {
     if (!uploadedImageUrl || !selectedImageId) return;
@@ -179,156 +186,24 @@ export default function StyleCardPage() {
           </p>
         </div>
 
-        {/* Main Layout - Responsive Split Screen */}
-        <div className={`
-          ${isMobile ? 'flex flex-col gap-6' : ''}
-          ${isTablet ? 'flex flex-col md:flex-row gap-6' : ''}
-          ${isDesktop ? 'flex flex-col lg:flex-row gap-8' : ''}
-        `}>
-          {/* Left Column - Upload Section */}
-          <div className={`
-            ${isMobile ? 'w-full' : ''}
-            ${isTablet ? 'md:w-full' : ''}
-            ${isDesktop ? 'lg:w-2/5' : ''}
-          `}>
-            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Your Photo</h2>
-              
-              {/* Image Upload Component */}
-              <div className="mb-4 sm:mb-6">
-                <ImageUpload 
-                  onImageUpload={handleImageUpload}
-                  previewUrl={uploadedImageUrl || undefined}
-                />
-              </div>
-
-              {/* Selected Reference Preview - Mobile shows below upload, desktop shows above button */}
-              {selectedImage && (
-                <div className="mb-4 sm:mb-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Selected Reference Style</h3>
-                  <div className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
-                    <Image 
-                      src={selectedImage.url} 
-                      alt={selectedImage.title}
-                      width={64}
-                      height={64}
-                      className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg"
-                    />
-                    <div>
-                      <div className="font-medium text-gray-800 text-sm sm:text-base">{selectedImage.title}</div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Try On Button */}
-              <TryOnButton 
-                onClick={handleTryOn}
-                disabled={!uploadedImageUrl || !selectedImageId}
-                loading={isProcessing}
-                selectedImageId={selectedImageId}
-              />
-            </div>
-          </div>
-
-          {/* Right Column - Reference Images */}
-          <div className={`
-            ${isMobile ? 'w-full' : ''}
-            ${isTablet ? 'md:w-full' : ''}
-            ${isDesktop ? 'lg:w-3/5' : ''}
-          `}>
-            <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8" id="reference-images-section">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Curated Reference Images</h2>
-              
-              {/* Loading indicator */}
-              {loading && (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
-                </div>
-              )}
-              
-              {/* Error message */}
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                  <div className="text-red-800">{error}</div>
-                  <button 
-                    onClick={() => window.location.reload()}
-                    className="mt-2 text-red-600 hover:text-red-800 text-sm font-medium"
-                  >
-                    Retry
-                  </button>
-                </div>
-              )}
-              
-              {/* Reference Image Grid Component */}
-              {!loading && !error && (
-                <ReferenceImageGrid
-                  images={referenceImages}
-                  selectedImageId={selectedImageId}
-                  onImageSelect={handleImageSelect}
-                />
-              )}
-              {/* Social icons row to mimic index footer styling */}
-              <div className="mt-6 flex justify-center space-x-4 text-gray-600">
-                <a href="https://instagram.com/chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
-                  <FaInstagram className="inline-block align-middle text-lg" aria-label="Instagram" />
-                </a>
-                <a href="https://youtube.com/channel/UCaQ08bul4f6VeeXXP1Ev95w" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
-                  <FaYoutube className="inline-block align-middle text-lg" aria-label="YouTube" />
-                </a>
-                <a href="https://www.tiktok.com/@chicbysally" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500">
-                  <FaTiktok className="inline-block align-middle text-lg" aria-label="TikTok" />
-                </a>
-              </div>
-              
-              {/* Pagination */}
-              {!loading && !error && totalPages > 1 && (
-                <div className="flex justify-center mt-8">
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className={`px-4 py-2 rounded-lg ${
-                        currentPage === 1
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      Previous
-                    </button>
-                    
-                    <div className="flex items-center px-4 text-gray-600">
-                      Page {currentPage} of {totalPages}
-                    </div>
-                    
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className={`px-4 py-2 rounded-lg ${
-                        currentPage === totalPages
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Results Section */}
-        <div className="mt-8 sm:mt-12 bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
-          <ResultsDisplay
-            originalImage={uploadedImageUrl || undefined}
-            referenceImage={selectedImage?.url}
-            resultImage={showResults ? "/images/result-placeholder.jpg" : undefined}
-            onDownload={handleDownload}
-            showResults={showResults}
+        {/* Face Swap Component - Integrated with Error Boundary */}
+        <ErrorBoundary>
+          <FaceSwapComponent 
+            referenceImageUrl={selectedImage?.url}
+            referenceImageTitle={selectedImage?.title}
+            referenceImages={referenceImages}
+            selectedImageId={selectedImageId}
+            onImageSelect={handleImageSelect}
+            onFaceSwapComplete={(result) => {
+              console.log('Face swap completed:', result);
+              setShowResults(true);
+            }}
+            onError={(error) => {
+              console.error('Face swap error:', error);
+            }}
           />
-        </div>
+        </ErrorBoundary>
+        
       </main>
 
       {/* Footer */}

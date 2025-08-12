@@ -15,27 +15,39 @@ export default function ReferenceImageGrid({
 }: ReferenceImageGridProps) {
   return (
     <div className="w-full">
-      {/* Image Grid - 2 columns on mobile, 3 on desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {/* Horizontal scrollable container with enhanced styling */}
+      <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-thin scrollbar-thumb-pink-500 scrollbar-track-pink-100">
         {images.map((image) => (
           <div 
             key={image.id}
             onClick={() => onImageSelect(image)}
-            className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 ${
+            className={`flex-shrink-0 w-1/3 group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 transform ${
               selectedImageId === image.id
-                ? 'ring-4 ring-pink-500 ring-opacity-50'
-                : 'hover:ring-2 hover:ring-pink-300'
+                ? 'ring-4 ring-pink-500 ring-offset-2 ring-offset-white scale-105 shadow-lg'
+                : 'hover:ring-2 hover:ring-pink-300 hover:scale-105 hover:shadow-md'
             }`}
+            style={{ flexBasis: 'calc(33.333% - 1rem)' }}
           >
             {/* Fixed-size square tile with rounded corners */}
             <div className="relative bg-gray-100 overflow-hidden rounded-xl" style={{ aspectRatio: '1 / 1' }}>
               <img 
                 src={image.url} 
                 alt={image.title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className={`w-full h-full object-cover object-top object-center transition-all duration-300 ${
+                  selectedImageId === image.id 
+                    ? 'brightness-110' 
+                    : 'group-hover:brightness-105'
+                }`}
               />
+              {/* Selection indicator overlay */}
+              {selectedImageId === image.id && (
+                <div className="absolute inset-0 bg-gradient-to-t from-pink-500/20 to-transparent flex items-end justify-center pb-2">
+                  <div className="bg-pink-500 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                    Selected
+                  </div>
+                </div>
+              )}
             </div>
-            {/* Hide filename/title per request */}
           </div>
         ))}
       </div>

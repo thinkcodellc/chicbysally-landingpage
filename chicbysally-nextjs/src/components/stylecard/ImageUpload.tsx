@@ -3,191 +3,279 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
-interface ImageUploadProps {
+export interface ImageUploadProps {
   // After compression, emit the compressed File; parent will create an object URL for preview
-  onImageUpload: (file: File) => void;
+  onImageUpload: (file: File, type: 'input' | 'swap') => void;
   // Parent controls preview by passing the preview object URL back in
-  previewUrl?: string;
+  previewUrls?: {
+    input?: string;
+    swap?: string;
+  };
+  // Optional labels for the upload areas
+  labels?: {
+    input?: string;
+    swap?: string;
+  };
+  // Optional descriptions for the upload areas
+  descriptions?: {
+    input?: string;
+    swap?: string;
+  };
 }
 
-export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  // Preview is controlled by parent; sanitize to avoid falsy empty strings
-  const preview = typeof previewUrl === "string" && previewUrl.trim().length > 0 ? previewUrl : undefined;
-  const [error, setError] = useState<string | null>(null);
-  const [compressing, setCompressing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const objectUrlRef = useRef<string | null>(null);
-  const isActiveRef = useRef(true);
-  // Simple re-entrancy guard (kept minimal to avoid blocking input)
-  const isOpeningRef = useRef(false);
+export default function ImageUpload({ 
+  onImageUpload, 
+  previewUrls = {}, 
+  labels = {},
+  descriptions = {}
+}: ImageUploadProps) {
+  // State for input image (user's face)
+  const [inputState, setInputState] = useState({
+    isDragging: false,
+    error: null as string | null,
+    compressing: false,
+  });
+  
+  // State for swap image (reference style)
+  const [swapState, setSwapState] = useState({
+    isDragging: false,
+    error: null as string | null,
+    compressing: false,
+  });
 
-  // Cleanup object URL and mark inactive on unmount
-  // Prevents setState after unmount and ensures we don't revoke an already-removed node
+  const inputFileRef = useRef<HTMLInputElement>(null);
+  const swapFileRef = useRef<HTMLInputElement>(null);
+  const isActiveRef = useRef(true);
+  const isOpeningRef = useRef({ input: false, swap: false });
+
+  // Default labels
+  const defaultLabels = {
+    input: "Upload Your Photo",
+    swap: "Choose Reference Style",
+    ...labels
+  };
+
+  // Default descriptions
+  const defaultDescriptions = {
+    input: "Drag and drop your photo here, or click to browse",
+    swap: "Drag and drop the reference style image here, or click to browse",
+    ...descriptions
+  };
+
+  // Cleanup on unmount
   useEffect(() => {
     isActiveRef.current = true;
     return () => {
       isActiveRef.current = false;
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
-      }
     };
   }, []);
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, type: 'input' | 'swap') => {
     e.preventDefault();
-    setIsDragging(true);
+    if (type === 'input') {
+      setInputState(prev => ({ ...prev, isDragging: true }));
+    } else {
+      setSwapState(prev => ({ ...prev, isDragging: true }));
+    }
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (e: React.DragEvent, type: 'input' | 'swap') => {
     e.preventDefault();
-    setIsDragging(false);
+    if (type === 'input') {
+      setInputState(prev => ({ ...prev, isDragging: false }));
+    } else {
+      setSwapState(prev => ({ ...prev, isDragging: false }));
+    }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent, type: 'input' | 'swap') => {
     e.preventDefault();
-    setIsDragging(false);
+    if (type === 'input') {
+      setInputState(prev => ({ ...prev, isDragging: false }));
+    } else {
+      setSwapState(prev => ({ ...prev, isDragging: false }));
+    }
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      handleFile(file);
+      handleFile(file, type);
     }
   };
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Always release guard when dialog closes (even on cancel) on next tick
-    setTimeout(() => { isOpeningRef.current = false; }, 0);
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>, type: 'input' | 'swap') => {
+    setTimeout(() => { 
+      isOpeningRef.current = { ...isOpeningRef.current, [type]: false }; 
+    }, 0);
+    
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      handleFile(file);
+      handleFile(file, type);
     }
   };
 
-  const handleFile = async (file: File) => {
-    setError(null);
+  const handleFile = async (file: File, type: 'input' | 'swap') => {
+    const setState = type === 'input' ? setInputState : setSwapState;
+    
+    setState(prev => ({ ...prev, error: null }));
+    
     const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
     if (!file.type.startsWith("image/") || !allowedTypes.has(file.type)) {
-      setError("Please upload a JPEG, PNG, or WebP image.");
+      setState(prev => ({ ...prev, error: "Please upload a JPEG, PNG, or WebP image." }));
       return;
     }
+    
     try {
       let workingFile = file;
       const ONE_MB = 1_000_000;
+      
       if (workingFile.size > ONE_MB) {
-        setCompressing(true);
+        setState(prev => ({ ...prev, compressing: true }));
         workingFile = await compressImage(workingFile, ONE_MB);
-        setCompressing(false);
+        setState(prev => ({ ...prev, compressing: false }));
+        
         if (workingFile.size > ONE_MB) {
-          setError("Could not compress below 1 MB. Please choose a smaller image.");
+          setState(prev => ({ ...prev, error: "Could not compress below 1 MB. Please choose a smaller image." }));
           return;
         }
       }
 
-      // Emit the compressed File so parent can create an object URL for immediate preview
-      onImageUpload(workingFile);
+      // Emit the compressed File with type information
+      onImageUpload(workingFile, type);
     } catch (err) {
       console.error("Image upload error:", err);
-      setCompressing(false);
+      setState(prev => ({ ...prev, compressing: false }));
       if (isActiveRef.current) {
-        setError("Failed to process the image. Please try again.");
+        setState(prev => ({ ...prev, error: "Failed to process the image. Please try again." }));
       }
     } finally {
-      // Always clear the file input so selecting the same file re-triggers onChange
-      if (fileInputRef.current) {
+      // Always clear the file input
+      const fileRef = type === 'input' ? inputFileRef : swapFileRef;
+      if (fileRef.current) {
         try {
-          fileInputRef.current.value = "";
+          fileRef.current.value = "";
         } catch {}
       }
       // Ensure dialog guard is released
-      isOpeningRef.current = false;
+      isOpeningRef.current = { ...isOpeningRef.current, [type]: false };
     }
   };
 
-  const handleClick = () => {
-    if (compressing) return;
-    // Minimize chances of a stuck guard: set and release on a short timer if no onChange
-    if (isOpeningRef.current) return;
-    isOpeningRef.current = true;
-    // Some browsers need a microtask delay to open the dialog reliably
+  const handleClick = (type: 'input' | 'swap') => {
+    const state = type === 'input' ? inputState : swapState;
+    const fileRef = type === 'input' ? inputFileRef : swapFileRef;
+    
+    if (state.compressing) return;
+    
+    if (isOpeningRef.current[type]) return;
+    isOpeningRef.current = { ...isOpeningRef.current, [type]: true };
+    
     setTimeout(() => {
-      // If the input is disabled by browser focus/blur timing, ensure it exists and is enabled
-      if (fileInputRef.current) {
-        fileInputRef.current.click();
+      if (fileRef.current) {
+        fileRef.current.click();
       }
-      // Failsafe: if onChange doesn’t fire (user ESC/cancel), release guard shortly
-      setTimeout(() => { isOpeningRef.current = false; }, 500);
+      setTimeout(() => { 
+        isOpeningRef.current = { ...isOpeningRef.current, [type]: false }; 
+      }, 500);
     }, 0);
   };
 
-  return (
-    <div className="w-full">
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileInput}
-        accept="image/*"
-        className="hidden"
-      />
+  const renderUploadArea = (type: 'input' | 'swap') => {
+    const state = type === 'input' ? inputState : swapState;
+    const previewUrl = previewUrls[type];
+    const label = defaultLabels[type];
+    const description = defaultDescriptions[type];
+    const fileRef = type === 'input' ? inputFileRef : swapFileRef;
 
-      {/* Error banner */}
-      {error && (
-        <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="status" aria-live="polite">
-          {error}
-        </div>
-      )}
-      
-      <div 
-        role="button"
-        aria-disabled={compressing}
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-          isDragging 
-            ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-200' 
-            : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
-        } ${compressing ? 'opacity-80' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={handleClick}
-      >
-        {preview ? (
-          <div className="relative block w-full aspect-[4/5] md:aspect-square min-h-[240px]">
-            {/* Prefer next/image; additionally render a plain img for robustness */}
-            <Image 
-              src={preview} 
-              alt="Preview" 
-              fill
-              sizes="100vw"
-              className="object-cover rounded-lg"
-              unoptimized
-              priority
-            />
-            {/* Always-on fallback duplicate to guarantee render */}
-            <img src={preview} alt="Preview" className="hidden w-full h-full object-cover rounded-lg" onError={(e) => {
-              // If next/image fails, reveal the plain img
-              (e.currentTarget as HTMLImageElement).classList.remove("hidden");
-            }} />
+    return (
+      <div className="w-full">
+        <input
+          type="file"
+          ref={fileRef}
+          onChange={(e) => handleFileInput(e, type)}
+          accept="image/*"
+          className="hidden"
+        />
+
+        {/* Error banner */}
+        {state.error && (
+          <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="status" aria-live="polite">
+            {state.error}
           </div>
-        ) : (
-          <>
-            <div className="mb-4">
-              <i className="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
-            </div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Upload Your Photo</h3>
-            <p className="text-gray-500 text-sm mb-4">
-              Drag and drop your photo here, or click to browse
-            </p>
-            <button 
-              type="button"
-              onClick={handleClick}
-              className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition duration-300"
-              aria-busy={compressing}
-              disabled={compressing}
-            >
-              {compressing ? "Compressing..." : "Choose File"}
-            </button>
-          </>
         )}
+        
+        <div 
+          role="button"
+          aria-disabled={state.compressing}
+          className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+            state.isDragging 
+              ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-200' 
+              : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
+          } ${state.compressing ? 'opacity-80' : ''}`}
+          onDragOver={(e) => handleDragOver(e, type)}
+          onDragLeave={(e) => handleDragLeave(e, type)}
+          onDrop={(e) => handleDrop(e, type)}
+          onClick={() => handleClick(type)}
+        >
+          {previewUrl ? (
+            <div className="relative block w-full aspect-[4/5] md:aspect-square min-h-[240px]">
+              <Image 
+                src={previewUrl} 
+                alt={`Preview - ${label}`} 
+                fill
+                sizes="100vw"
+                className="object-cover rounded-lg"
+                unoptimized
+                priority
+              />
+              <img 
+                src={previewUrl} 
+                alt={`Preview - ${label}`} 
+                className="hidden w-full h-full object-cover rounded-lg" 
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).classList.remove("hidden");
+                }} 
+              />
+            </div>
+          ) : (
+            <>
+              <div className="mb-4">
+                <i className={`fas ${type === 'input' ? 'fa-user' : 'fa-image'} text-4xl text-gray-400`}></i>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{label}</h3>
+              <p className="text-gray-500 text-sm mb-4">
+                {description}
+              </p>
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClick(type);
+                }}
+                className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition duration-300"
+                aria-busy={state.compressing}
+                disabled={state.compressing}
+              >
+                {state.compressing ? "Compressing..." : "Choose File"}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Input Image Upload Area */}
+      <div>
+        <h4 className="text-sm font-medium text-gray-700 mb-2">Your Photo</h4>
+        {renderUploadArea('input')}
+      </div>
+      
+      {/* Swap Image Upload Area */}
+      <div>
+        <h4 className="text-sm font-medium text-gray-700 mb-2">Reference Style</h4>
+        {renderUploadArea('swap')}
       </div>
     </div>
   );

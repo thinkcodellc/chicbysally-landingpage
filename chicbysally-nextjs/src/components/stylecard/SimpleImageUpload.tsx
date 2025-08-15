@@ -2,36 +2,31 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { FaCloudUploadAlt } from "react-icons/fa";
 
-interface ImageUploadProps {
-  // After compression, emit the compressed File; parent will create an object URL for preview
+interface SimpleImageUploadProps {
   onImageUpload: (file: File) => void;
-  // Parent controls preview by passing the preview object URL back in
+  onReset: () => void;
   previewUrl?: string;
+  isProcessing?: boolean;
 }
 
-export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadProps) {
+export default function SimpleImageUpload({ 
+  onImageUpload, 
+  onReset,
+  previewUrl, 
+  isProcessing = false 
+}: SimpleImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
-  // Preview is controlled by parent; sanitize to avoid falsy empty strings
-  const preview = typeof previewUrl === "string" && previewUrl.trim().length > 0 ? previewUrl : undefined;
   const [error, setError] = useState<string | null>(null);
   const [compressing, setCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const objectUrlRef = useRef<string | null>(null);
   const isActiveRef = useRef(true);
-  // Simple re-entrancy guard (kept minimal to avoid blocking input)
-  const isOpeningRef = useRef(false);
 
-  // Cleanup object URL and mark inactive on unmount
-  // Prevents setState after unmount and ensures we don't revoke an already-removed node
   useEffect(() => {
     isActiveRef.current = true;
     return () => {
       isActiveRef.current = false;
-      if (objectUrlRef.current) {
-        URL.revokeObjectURL(objectUrlRef.current);
-        objectUrlRef.current = null;
-      }
     };
   }, []);
 
@@ -56,8 +51,6 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Always release guard when dialog closes (even on cancel) on next tick
-    setTimeout(() => { isOpeningRef.current = false; }, 0);
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       handleFile(file);
@@ -84,7 +77,7 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
         }
       }
 
-      // Emit the compressed File so parent can create an object URL for immediate preview
+      // Emit the compressed File for preview
       onImageUpload(workingFile);
     } catch (err) {
       console.error("Image upload error:", err);
@@ -92,32 +85,14 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
       if (isActiveRef.current) {
         setError("Failed to process the image. Please try again.");
       }
-    } finally {
-      // Always clear the file input so selecting the same file re-triggers onChange
-      if (fileInputRef.current) {
-        try {
-          fileInputRef.current.value = "";
-        } catch {}
-      }
-      // Ensure dialog guard is released
-      isOpeningRef.current = false;
     }
   };
 
   const handleClick = () => {
-    if (compressing) return;
-    // Minimize chances of a stuck guard: set and release on a short timer if no onChange
-    if (isOpeningRef.current) return;
-    isOpeningRef.current = true;
-    // Some browsers need a microtask delay to open the dialog reliably
-    setTimeout(() => {
-      // If the input is disabled by browser focus/blur timing, ensure it exists and is enabled
-      if (fileInputRef.current) {
-        fileInputRef.current.click();
-      }
-      // Failsafe: if onChange doesn't fire (user ESC/cancel), release guard shortly
-      setTimeout(() => { isOpeningRef.current = false; }, 500);
-    }, 0);
+    if (compressing || isProcessing) return;
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   return (
@@ -137,58 +112,65 @@ export default function ImageUpload({ onImageUpload, previewUrl }: ImageUploadPr
         </div>
       )}
       
-      <div 
-        role="button"
-        aria-disabled={compressing}
-        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
-          isDragging 
-            ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-200' 
-            : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
-        } ${compressing ? 'opacity-80' : ''}`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        onClick={handleClick}
-      >
-        {preview ? (
-          <div className="relative block w-full aspect-[4/5] md:aspect-square min-h-[240px]">
-            {/* Prefer next/image; additionally render a plain img for robustness */}
-            <Image 
-              src={preview} 
-              alt="Preview" 
-              fill
-              sizes="100vw"
-              className="object-cover rounded-lg"
-              style={{ objectPosition: 'top center' }}
-              unoptimized
-              priority
-            />
-            {/* Always-on fallback duplicate to guarantee render */}
-            <img src={preview} alt="Preview" className="hidden w-full h-full object-cover rounded-lg" style={{ objectPosition: 'top center' }} onError={(e) => {
-              // If next/image fails, reveal the plain img
-              (e.currentTarget as HTMLImageElement).classList.remove("hidden");
-            }} />
-          </div>
-        ) : (
-          <>
-            <div className="mb-4">
-              <i className="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+      <div className="flex flex-col gap-4">
+        <div 
+          role="button"
+          aria-disabled={compressing || isProcessing}
+          className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-300 ${
+            isDragging 
+              ? 'border-pink-500 bg-pink-50 ring-2 ring-pink-200' 
+              : 'border-gray-300 hover:border-pink-300 hover:bg-pink-50'
+          } ${(compressing || isProcessing) ? 'opacity-80' : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={(e) => {
+            // Prevent double triggering when clicking on child elements
+            if (e.target === e.currentTarget) {
+              handleClick();
+            }
+          }}
+        >
+          {previewUrl ? (
+            <div className="relative block w-full aspect-[4/5] md:aspect-square min-h-[240px]">
+              <Image 
+                src={previewUrl} 
+                alt="Your uploaded photo" 
+                fill
+                sizes="100vw"
+                className="object-cover rounded-lg"
+                unoptimized
+                priority
+              />
             </div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Upload Your Photo</h3>
-            <p className="text-gray-500 text-sm mb-4">
-              Drag and drop your photo here, or click to browse
-            </p>
-            <button 
-              type="button"
-              onClick={handleClick}
-              className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition duration-300"
-              aria-busy={compressing}
-              disabled={compressing}
-            >
-              {compressing ? "Compressing..." : "Choose File"}
-            </button>
-          </>
-        )}
+          ) : (
+            <>
+              <div className="flex justify-center mb-4">
+                <FaCloudUploadAlt className="text-4xl text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Upload Your Photo</h3>
+              <p className="text-gray-500 text-sm mb-4">
+                Drag and drop your photo here, or click to browse
+              </p>
+              <div className="flex justify-center">
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent event bubbling
+                    handleClick();
+                  }}
+                  className="bg-pink-500 text-white px-6 py-2 rounded-lg hover:bg-pink-600 transition duration-300"
+                  aria-busy={compressing || isProcessing}
+                  disabled={compressing || isProcessing}
+                >
+                  {compressing || isProcessing ? "Processing..." : "Choose File"}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+        
+        {/* Reset button removed from here - main reset buttons are handled in parent component */}
       </div>
     </div>
   );
@@ -219,7 +201,6 @@ async function compressImage(file: File, targetBytes = 1_000_000): Promise<File>
   const width = img.naturalWidth;
   const height = img.naturalHeight;
   const maxEdgeStart = Math.max(width, height);
-  const minQuality = 0.5;
   const qualitySteps = [0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5];
   const downscaleSteps = [1600, 1400, 1200, 1000, 900, 800];
 
@@ -263,21 +244,11 @@ async function compressImage(file: File, targetBytes = 1_000_000): Promise<File>
   return outFile;
 }
 
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error("FileReader failed"));
-    reader.onload = () => resolve(reader.result as string);
-    reader.readAsDataURL(file);
-  });
-}
-
 function fileToHTMLImageElement(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => reject(new Error("FileReader failed"));
     reader.onload = () => {
-      // Explicitly construct an HTMLImageElement to satisfy TS during build
       const img: HTMLImageElement = document.createElement("img");
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error("Image decode failed"));

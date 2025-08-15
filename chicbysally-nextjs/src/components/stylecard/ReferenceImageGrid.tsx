@@ -1,6 +1,7 @@
 "use client";
 
 import { ReferenceImage } from "@/lib/data";
+import { appendImageKitTransformations } from "@/lib/utils";
 
 interface ReferenceImageGridProps {
   images: ReferenceImage[];
@@ -20,7 +21,11 @@ export default function ReferenceImageGrid({
         {images.map((image) => (
           <div 
             key={image.id}
-            onClick={() => onImageSelect(image)}
+            onClick={() => {
+              const transformedUrl = appendImageKitTransformations(image.url);
+              console.log('Selected reference image URL with transformations:', transformedUrl);
+              onImageSelect(image);
+            }}
             className={`group cursor-pointer rounded-xl overflow-hidden transition-all duration-300 ${
               selectedImageId === image.id
                 ? 'ring-4 ring-pink-500 ring-opacity-50'

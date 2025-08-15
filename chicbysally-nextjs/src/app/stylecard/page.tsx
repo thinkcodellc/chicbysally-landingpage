@@ -3,19 +3,15 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import Link from "next/link";
-// IMPORTANT: Avoid importing server-only env reading code into a client component.
-// We will call a server action (API) instead.
-import { ReferenceImage } from "@/lib/data";
-import Image from "next/image";
-import ImageUpload from "@/components/stylecard/ImageUpload";
-import ReferenceImageGrid from "@/components/stylecard/ReferenceImageGrid";
-import TryOnButton from "@/components/stylecard/TryOnButton";
-import ResultsDisplay from "@/components/stylecard/ResultsDisplay";
 import Navbar from "@/components/Navbar";
 import StyleCardAccessDenied from "@/components/StyleCardAccessDenied";
 import { Protect } from "@clerk/nextjs";
+import { ReferenceImage } from "@/lib/data";
+import SimpleImageUpload from "@/components/stylecard/SimpleImageUpload";
+import ReferenceImageGrid from "@/components/stylecard/ReferenceImageGrid";
+import ResultsDisplay from "@/components/stylecard/ResultsDisplay";
 import { FaInstagram, FaYoutube, FaTiktok } from "react-icons/fa";
+import { FaceSwapService, FaceSwapInput, FaceSwapOutput } from "@/components/stylecard/FaceSwapService";
 
 export default function StyleCardPage() {
   const { user, isLoaded } = useUser();
@@ -92,14 +88,15 @@ export default function StyleCardPage() {
 function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile: boolean; isTablet: boolean; isDesktop: boolean; }) {
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
   const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
-  // After upload we keep only the server URL for preview/use
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showResults, setShowResults] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalImages, setTotalImages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [result, setResult] = useState<FaceSwapOutput | null>(null);
+  const [showResults, setShowResults] = useState(false);
 
   // Load reference images with pagination
   const loadImages = async () => {
@@ -137,35 +134,8 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
     loadImages();
   }, [currentPage]);
 
-  // ImageUpload now returns the compressed File; create an object URL for immediate preview
-  const handleImageUpload = (file: File) => {
-    try {
-      const url = URL.createObjectURL(file);
-      setUploadedImageUrl(url);
-    } catch (e) {
-      console.warn("Failed to create preview URL:", e);
-    }
-  };
-
-  const handleImageSelect = (image: ReferenceImage) => {
-    setSelectedImageId(image.id);
-  };
-
-  const handleTryOn = async () => {
-    if (!uploadedImageUrl || !selectedImageId) return;
-    
-    setIsProcessing(true);
-    setShowResults(true);
-    
-    // Simulate processing delay
-    setTimeout(() => {
-      setIsProcessing(false);
-    }, 2000);
-  };
-
-  const handleDownload = async () => {
-    // Simulate download
-    console.log("Downloading results...");
+  const handleImageSelect = (image: ReferenceImage | null) => {
+    setSelectedImageId(image?.id || null);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -177,7 +147,90 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
     }
   };
 
-  const selectedImage = referenceImages.find(img => img.id === selectedImageId);
+  const handleImageUpload = (file: File) => {
+    try {
+      const url = URL.createObjectURL(file);
+      setUploadedImageUrl(url);
+      setUploadedImageFile(file);
+      // Clear previous results when new image is uploaded
+      setResult(null);
+      setShowResults(false);
+    } catch (e) {
+      console.warn("Failed to create preview URL:", e);
+    }
+  };
+
+  const handleResetImage = () => {
+    setUploadedImageUrl(null);
+    setUploadedImageFile(null);
+    setResult(null);
+    setShowResults(false);
+  };
+
+  const handleResetReference = () => {
+    setSelectedImageId(null);
+    setResult(null);
+    setShowResults(false);
+  };
+
+  const handleResetAll = () => {
+    handleResetImage();
+    handleResetReference();
+  };
+
+  const handleFaceSwap = async (file: File) => {
+    if (!selectedImageId) {
+      setError("Please select a reference style first.");
+      return;
+    }
+
+    const selectedImage = referenceImages.find(img => img.id === selectedImageId);
+    if (!selectedImage) {
+      setError("Selected reference image not found.");
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // Convert file to data URL for API
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const faceSwapInput: FaceSwapInput = {
+        inputImage: selectedImage.url, // Reference image (target)
+        swapImage: dataUrl             // User uploaded photo (swap)
+      };
+
+      // Call face-swap API
+      const faceSwapResult = await FaceSwapService.performFaceSwap(faceSwapInput);
+      
+      setResult(faceSwapResult);
+      setShowResults(true);
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      console.error('Face swap error:', err);
+      setError(errorMessage);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (result?.url) {
+      const link = document.createElement('a');
+      link.href = result.url;
+      link.download = 'stylecard.jpg';
+      link.click();
+    }
+  };
+
   const totalPages = Math.ceil(totalImages / 6);
 
   return (
@@ -185,7 +238,7 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
       <div className="text-center mb-8 sm:mb-12">
         <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">Virtual Try-On Studio</h1>
         <p className="text-base sm:text-xl text-gray-600 max-w-2xl sm:max-w-3xl mx-auto px-2">
-          Upload your photo and select from our curated collection to see how different styles look on you
+          Follow these simple steps to create your personalized StyleCard
         </p>
       </div>
 
@@ -202,42 +255,34 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
           ${isDesktop ? 'lg:w-2/5' : ''}
         `}>
           <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Your Photo</h2>
-            
-            {/* Image Upload Component */}
-            <div className="mb-4 sm:mb-6">
-              <ImageUpload 
-                onImageUpload={handleImageUpload}
-                previewUrl={uploadedImageUrl || undefined}
-              />
+            <div className="flex items-center mb-4 sm:mb-6">
+              <div className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white font-bold text-sm mr-3">1</div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Choose Your Photo</h2>
             </div>
-
-            {/* Selected Reference Preview - Mobile shows below upload, desktop shows above button */}
-            {selectedImage && (
-              <div className="mb-4 sm:mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Selected Reference Style</h3>
-                <div className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
-                  <Image 
-                    src={selectedImage.url} 
-                    alt={selectedImage.title}
-                    width={64}
-                    height={64}
-                    className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg"
-                  />
-                  <div>
-                    <div className="font-medium text-gray-800 text-sm sm:text-base">{selectedImage.title}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Try On Button */}
-            <TryOnButton 
-              onClick={handleTryOn}
-              disabled={!uploadedImageUrl || !selectedImageId}
-              loading={isProcessing}
-              selectedImageId={selectedImageId}
+            
+            {/* Simple Image Upload Component */}
+            <SimpleImageUpload
+              onImageUpload={handleImageUpload}
+              onReset={handleResetImage}
+              previewUrl={uploadedImageUrl || undefined}
+              isProcessing={isProcessing}
             />
+            
+            {/* Reset Buttons - Centered */}
+            <div className="flex justify-center gap-2 mt-4">
+              <button
+                onClick={handleResetImage}
+                className="px-4 py-2 rounded-lg text-sm bg-gray-200 text-gray-700 hover:bg-gray-300"
+              >
+                Reset Photo
+              </button>
+              <button
+                onClick={handleResetAll}
+                className="px-4 py-2 rounded-lg text-sm bg-gray-200 text-gray-700 hover:bg-gray-300"
+              >
+                Reset All
+              </button>
+            </div>
           </div>
         </div>
 
@@ -248,7 +293,10 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
           ${isDesktop ? 'lg:w-3/5' : ''}
         `}>
           <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8" id="reference-images-section">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Curated Reference Images</h2>
+            <div className="flex items-center mb-4 sm:mb-6">
+              <div className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white font-bold text-sm mr-3">2</div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Choose a Curated Style</h2>
+            </div>
             
             {/* Loading indicator */}
             {loading && (
@@ -272,11 +320,13 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
             
             {/* Reference Image Grid Component */}
             {!loading && !error && (
-              <ReferenceImageGrid
-                images={referenceImages}
-                selectedImageId={selectedImageId}
-                onImageSelect={handleImageSelect}
-              />
+              <div className="mt-4 bg-white rounded-xl shadow-lg p-4 overflow-x-auto">
+                <ReferenceImageGrid
+                  images={referenceImages}
+                  selectedImageId={selectedImageId}
+                  onImageSelect={handleImageSelect}
+                />
+              </div>
             )}
             {/* Social icons row to mimic index footer styling */}
             <div className="mt-6 flex justify-center space-x-4 text-gray-600">
@@ -325,6 +375,30 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
                 </div>
               </div>
             )}
+            
+            {/* Step 3: Create StyleCard Button */}
+            <div className="flex justify-center mt-8">
+              <div className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white font-bold text-sm mr-3 mb-2">3</div>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Create StyleCard</h3>
+            </div>
+            <div className="flex justify-center">
+              <button
+                onClick={() => uploadedImageFile && handleFaceSwap(uploadedImageFile)}
+                disabled={!uploadedImageFile || !selectedImageId || isProcessing}
+                className={`px-8 py-3 rounded-lg font-medium text-lg ${
+                  uploadedImageFile && selectedImageId && !isProcessing
+                    ? 'bg-pink-500 text-white hover:bg-pink-600 transform hover:scale-105 transition-all duration-300 shadow-lg'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {isProcessing ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                    Generating StyleCard...
+                  </div>
+                ) : 'Create StyleCard'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -332,9 +406,11 @@ function StyleCardProtectedContent({ isMobile, isTablet, isDesktop }: { isMobile
       {/* Results Section */}
       <div className="mt-8 sm:mt-12 bg-white rounded-xl shadow-lg p-4 sm:p-6 md:p-8">
         <ResultsDisplay
-          originalImage={uploadedImageUrl || undefined}
-          referenceImage={selectedImage?.url}
-          resultImage={showResults ? "/images/result-placeholder.jpg" : undefined}
+          result={result || undefined}
+          originalImages={{
+            input: uploadedImageUrl || undefined,
+            swap: referenceImages.find(img => img.id === selectedImageId)?.url
+          }}
           onDownload={handleDownload}
           showResults={showResults}
         />

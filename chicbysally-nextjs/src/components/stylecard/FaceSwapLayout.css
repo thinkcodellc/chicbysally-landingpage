@@ -1,0 +1,240 @@
+/* FaceSwapComponent Layout Styles */
+
+.stylecard-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.stylecard-main-grid {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1.5rem;
+  min-height: calc(100vh - 200px);
+}
+
+/* Upload Section */
+.stylecard-upload-section {
+  grid-row: 1;
+}
+
+/* Reference Section */
+.stylecard-reference-section {
+  grid-row: 2;
+}
+
+/* Actions Section - Sticky at bottom */
+.stylecard-actions-section {
+  grid-row: 3;
+}
+
+.stylecard-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Results Section */
+.stylecard-results-section {
+  grid-row: 4;
+  margin-top: 2rem;
+}
+
+.stylecard-results {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Collapsible Sections */
+.stylecard-collapsible {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.stylecard-collapsible-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.stylecard-collapsible-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stylecard-collapsible-icon {
+  transition: transform 0.2s ease;
+  color: #6b7280;
+}
+
+.stylecard-collapsible.expanded .stylecard-collapsible-icon {
+  transform: rotate(180deg);
+}
+
+.stylecard-collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.stylecard-collapsible.expanded .stylecard-collapsible-content {
+  max-height: 1000px;
+  transition: max-height 0.5s ease-in;
+}
+
+.stylecard-collapsible-body {
+  padding: 1.5rem;
+}
+
+/* Image Area */
+.stylecard-image-area {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  border: 2px dashed #d1d5db;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  transition: all 0.2s ease;
+  background-color: #f9fafb;
+  cursor: pointer;
+}
+
+.stylecard-image-area:hover {
+  border-color: #ec4899;
+  background-color: #fdf2f8;
+}
+
+.stylecard-image-area.active {
+  border-color: #ec4899;
+  background-color: #fdf2f8;
+}
+
+.stylecard-image-preview {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* Loading Overlay */
+.stylecard-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.stylecard-loading-content {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .stylecard-container {
+    padding: 0 2rem;
+  }
+  
+  .stylecard-main-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+  
+  .stylecard-upload-section {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  
+  .stylecard-reference-section {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  
+  .stylecard-actions-section {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+  }
+  
+  .stylecard-results-section {
+    grid-column: 1 / span 2;
+    grid-row: 4;
+  }
+  
+  .stylecard-image-area {
+    min-height: 400px;
+  }
+  
+  .stylecard-image-preview {
+    height: 400px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .stylecard-container {
+    padding: 0 3rem;
+  }
+  
+  .stylecard-main-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+  }
+  
+  .stylecard-image-area {
+    min-height: 500px;
+  }
+  
+  .stylecard-image-preview {
+    height: 500px;
+  }
+}
+
+/* Error States */
+.stylecard-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+/* Animation for fade-in-out */
+@keyframes fade-in-out {
+  0% { opacity: 0; transform: translateY(10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+.animate-fade-in-out {
+  animation: fade-in-out 3s ease-in-out forwards;
+}
